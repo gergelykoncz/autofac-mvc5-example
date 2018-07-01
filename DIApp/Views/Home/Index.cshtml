@@ -1,0 +1,39 @@
+﻿@model IEnumerable<DIApp.DataAccess.Employee>
+
+<ul class="btn-group pull-right">
+    @foreach(string countryName in ViewBag.Countries)
+    {
+        @Html.ActionLink(countryName, "Index", new { country = countryName }, new { @class = "btn btn-default" })
+    }
+</ul>
+
+<h2>Employee list</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Photo</th>
+            <th>Last Name</th>
+            <th>First Name</th>
+            <th>City</th>
+            <th>Address</th>
+            <th>ZIP</th>
+            <th>Phone</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                <img class="employee-thumb" src="@Url.Action("RenderImage", new { id = item.EmployeeID })" />
+            </td>
+            <td>@item.LastName</td>
+            <td>@item.FirstName</td>
+            <td>@item.City</td>
+            <td>@item.Address</td>
+            <td>@item.PostalCode</td>
+            <td>@item.HomePhone</td>
+        </tr>
+        }
+    </tbody>
+</table>
