@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web.Mvc;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using DIApp;
+﻿using DIApp.BusinessLayer.Facade;
 using DIApp.Controllers;
+using DIApp.DataAccess;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using System.Collections.Generic;
+using System.Web.Mvc;
 
 namespace DIApp.Tests.Controllers
 {
@@ -13,42 +12,39 @@ namespace DIApp.Tests.Controllers
     public class HomeControllerTest
     {
         [TestMethod]
-        public void Index()
+        public void IndexShouldReturnValues()
         {
             // Arrange
-            HomeController controller = new HomeController();
+            IEnumerable<string> countries = new List<string>() { "Andorra", "Hungary" };
+            IEnumerable<Employee> employees = new List<Employee>() { new Employee() };
+
+            Mock<IEmployeeFacade> facade = new Mock<IEmployeeFacade>();
+            facade.Setup(x => x.GetEmployeeCountries()).Returns(countries);
+            facade.Setup(x => x.GetEmployeesByCountry(It.IsAny<string>())).Returns(employees);
+            HomeController controller = new HomeController(facade.Object);
+
 
             // Act
             ViewResult result = controller.Index() as ViewResult;
+            IEnumerable<string> countryNames = result.ViewBag.Countries;
 
             // Assert
-            Assert.IsNotNull(result);
+            Assert.AreEqual(countries, countryNames);
+            Assert.AreEqual(employees, result.Model);
         }
 
         [TestMethod]
-        public void About()
+        public void IndexShouldPassCountryParamToFacade()
         {
-            // Arrange
-            HomeController controller = new HomeController();
+            IEnumerable<Employee> employees = new List<Employee>() { new Employee() };
 
-            // Act
-            ViewResult result = controller.About() as ViewResult;
+            Mock<IEmployeeFacade> facade = new Mock<IEmployeeFacade>();
+            facade.Setup(x => x.GetEmployeesByCountry(It.IsAny<string>())).Returns(employees);
+            HomeController controller = new HomeController(facade.Object);
 
-            // Assert
-            Assert.AreEqual("Your application description page.", result.ViewBag.Message);
-        }
+            controller.Index("cc"); 
 
-        [TestMethod]
-        public void Contact()
-        {
-            // Arrange
-            HomeController controller = new HomeController();
-
-            // Act
-            ViewResult result = controller.Contact() as ViewResult;
-
-            // Assert
-            Assert.IsNotNull(result);
+            facade.Verify(x => x.GetEmployeesByCountry("cc"));
         }
     }
 }
