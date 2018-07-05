@@ -19,7 +19,9 @@ namespace DIApp
             builder.RegisterControllers(typeof(MvcApplication).Assembly);
 
             // Register EF6 data context
-            builder.RegisterType<NORTHWNDEntities>().AsSelf().InstancePerLifetimeScope();
+            var context = new NORTHWNDEntities();
+            context.Database.Log = s => System.Diagnostics.Debug.WriteLine(s, "EF");
+            builder.RegisterInstance(context).As<NORTHWNDEntities>();
 
             // Register all Repository classes from all assemblies, tie them to their interfaces and set their lifetime to per request
             builder.RegisterAssemblyTypes(AppDomain.CurrentDomain.GetAssemblies())
