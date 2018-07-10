@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+ 
 namespace DIApp.DataAccess.Repository
 {
     public class EmployeeRepository : IEmployeeRepository

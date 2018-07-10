@@ -31,5 +31,11 @@ namespace DIApp.Controllers
             ms.Position = 0;
             return File(ms, "image/jpeg");
         }
+
+        public ActionResult GetJson()
+        {
+            var employees = this._employeeFacade.GetEmployeesByCountry("USA");
+            return Json(employees, JsonRequestBehavior.AllowGet);
+        }
     }
 }

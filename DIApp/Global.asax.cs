@@ -1,10 +1,13 @@
 ﻿using Autofac;
 using Autofac.Integration.Mvc;
 using DIApp.DataAccess;
+using Castle.DynamicProxy;
 using System;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Autofac.Extras.DynamicProxy;
+using DIApp.Plumbing;
 
 namespace DIApp
 {
@@ -18,14 +21,19 @@ namespace DIApp
             // Register controllers from the current assembly
             builder.RegisterControllers(typeof(MvcApplication).Assembly);
 
+            builder.RegisterType<CacheAspect>().AsSelf();
+
             // Register EF6 data context
             var context = new NORTHWNDEntities();
             context.Database.Log = s => System.Diagnostics.Debug.WriteLine(s, "EF");
+            context.Configuration.ProxyCreationEnabled = false;
             builder.RegisterInstance(context).As<NORTHWNDEntities>();
 
             // Register all Repository classes from all assemblies, tie them to their interfaces and set their lifetime to per request
             builder.RegisterAssemblyTypes(AppDomain.CurrentDomain.GetAssemblies())
                 .Where(t => t.Name.EndsWith("Repository"))
+                //.EnableInterfaceInterceptors()
+                //.InterceptedBy(typeof(CacheAspect))
                 .AsImplementedInterfaces()
                 .InstancePerRequest();
 
